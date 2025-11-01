@@ -1,17 +1,15 @@
-//your JS code here. If required.
-// Select the DOM elements
-const loadingDiv = document.getElementById('loading');
-const errorDiv = document.getElementById('error');
-const outputDiv = document.getElementById('output');
+const output = document.getElementById("output");
+const btn = document.getElementById("download-images-button");
+const loadingDiv = document.getElementById("loading");
+const errorDiv = document.getElementById("error");
 
-// Sample image URLs (you can replace with your own)
-const imageUrls = [
-  "https://via.placeholder.com/150",
-  "https://via.placeholder.com/200",
-  "https://via.placeholder.com/250"
+const images = [
+  { url: "https://picsum.photos/id/237/200/300" },
+  { url: "https://picsum.photos/id/238/200/300" },
+  { url: "https://picsum.photos/id/239/200/300" },
 ];
 
-// Function to download a single image
+// Helper function: downloads a single image
 function downloadImage(url) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -23,10 +21,10 @@ function downloadImage(url) {
   });
 }
 
-// Main function to handle downloading multiple images
+// Main function: handles download of all images
 async function downloadImages() {
-  // Clear previous messages and images
-  outputDiv.innerHTML = "";
+  // Reset UI
+  output.innerHTML = "";
   errorDiv.textContent = "";
 
   // Show loading spinner
@@ -34,24 +32,27 @@ async function downloadImages() {
 
   try {
     // Download all images in parallel
-    const images = await Promise.all(imageUrls.map(downloadImage));
+    const downloadedImages = await Promise.all(
+      images.map(image => downloadImage(image.url))
+    );
 
     // Hide loading spinner
     loadingDiv.style.display = "none";
 
-    // Display all images in output div
-    images.forEach(img => {
+    // Display all downloaded images
+    downloadedImages.forEach(img => {
       img.style.margin = "10px";
-      outputDiv.appendChild(img);
+      img.style.borderRadius = "8px";
+      output.appendChild(img);
     });
   } catch (error) {
     // Hide loading spinner
     loadingDiv.style.display = "none";
 
-    // Display error message
+    // Show error message
     errorDiv.textContent = error;
   }
 }
 
-// Start downloading when page loads (or you can attach to a button)
-downloadImages();
+// Event listener for button
+btn.addEventListener("click", downloadImages);
